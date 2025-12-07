@@ -32,3 +32,27 @@ This Chrome extension displays a counter both in a popup and directly on any web
 
 ## File Structure
 
+```
+chrome-extension-1/
+├── manifest.json          # Extension manifest configuration
+├── popup.html             # Popup UI HTML
+├── popup.js               # Popup logic and counter handling
+├── content.js             # Content script injected into web pages
+├── jest.config.js         # Jest test configuration
+├── package.json           # Node.js dependencies and scripts
+├── assets/                # Extension icons
+│   ├── icon16.png
+│   ├── icon48.png
+│   └── icon128.png
+└── tests/                 # Test suite
+    ├── setup.js           # Jest setup with Chrome API mocks
+    ├── unit/              # Unit tests
+    │   ├── password.test.js
+    │   └── clipboard.test.js
+    ├── integration/       # Integration tests
+    │   ├── popup.test.js
+    │   └── content.test.js
+    ├── utils/             # Test utilities
+    │   └── test-helpers.js
+    └── README.md          # Test documentation
+```

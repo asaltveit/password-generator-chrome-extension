@@ -22,6 +22,11 @@ describe('Popup Integration Tests', () => {
     // Set up DOM with popup structure
     document.body.innerHTML = popupHTML;
     
+    // Mock navigator.clipboard
+    global.navigator.clipboard = {
+      writeText: jest.fn().mockResolvedValue(undefined)
+    };
+    
     // Mock the popup.js functionality
     const passwordDisplay = document.getElementById('passwordDisplay');
     const generatePasswordBtn = document.getElementById('generatePassword');
@@ -30,26 +35,46 @@ describe('Popup Integration Tests', () => {
     const collapseBtn = document.getElementById('collapseBtn');
     const body = document.body;
 
-    // Generate password function
+    // Generate password function (matches popup.js implementation)
     window.generatePassword = function() {
       const length = 16;
-      const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+      const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+      const charsetLength = charset.length;
+      
+      // Use crypto.getRandomValues for cryptographically secure randomness
+      const randomValues = new Uint32Array(length);
+      crypto.getRandomValues(randomValues);
+      
       let password = '';
       for (let i = 0; i < length; i++) {
-        password += charset.charAt(Math.floor(Math.random() * charset.length));
+        // Use modulo to map random value to charset index
+        password += charset[randomValues[i] % charsetLength];
       }
       return password;
     };
 
-    // Copy function
-    window.copyTextToClipboard = function(text) {
-      const copyFrom = document.createElement('textarea');
-      copyFrom.textContent = text;
-      document.body.appendChild(copyFrom);
-      copyFrom.select();
-      document.execCommand('copy');
-      copyFrom.blur();
-      document.body.removeChild(copyFrom);
+    // Copy function (matches popup.js implementation)
+    window.copyTextToClipboard = async function(text) {
+      try {
+        // Use modern Clipboard API (preferred method)
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        // Fallback for older browsers or if clipboard API is unavailable
+        console.warn('Clipboard API failed, using fallback:', err);
+        const copyFrom = document.createElement('textarea');
+        copyFrom.textContent = text;
+        copyFrom.style.position = 'fixed';
+        copyFrom.style.opacity = '0';
+        document.body.appendChild(copyFrom);
+        copyFrom.select();
+        try {
+          document.execCommand('copy');
+        } catch (fallbackErr) {
+          console.error('Fallback copy method also failed:', fallbackErr);
+        }
+        copyFrom.blur();
+        document.body.removeChild(copyFrom);
+      }
     };
 
     // Set up event listeners
@@ -64,10 +89,10 @@ describe('Popup Integration Tests', () => {
     }
 
     if (copyPasswordBtn) {
-      copyPasswordBtn.addEventListener('click', () => {
+      copyPasswordBtn.addEventListener('click', async () => {
         const password = copyPasswordBtn.dataset.password;
         if (password) {
-          window.copyTextToClipboard(password);
+          await window.copyTextToClipboard(password);
           const originalText = copyPasswordBtn.textContent;
           copyPasswordBtn.textContent = '✓ Copied!';
           setTimeout(() => {
@@ -92,6 +117,7 @@ describe('Popup Integration Tests', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
+    document.execCommand.mockClear();
   });
 
   test('should have all required DOM elements', () => {
@@ -142,7 +168,7 @@ describe('Popup Integration Tests', () => {
     expect(copyBtn.dataset.password.length).toBe(16);
   });
 
-  test('should copy password when copy button is clicked', () => {
+  test('should copy password when copy button is clicked', async () => {
     const generateBtn = document.getElementById('generatePassword');
     const copyBtn = document.getElementById('copyPassword');
     
@@ -151,9 +177,9 @@ describe('Popup Integration Tests', () => {
     const password = copyBtn.dataset.password;
     
     // Click copy button
-    copyBtn.click();
+    await copyBtn.click();
     
-    expect(document.execCommand).toHaveBeenCalledWith('copy');
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(password);
     expect(copyBtn.textContent).toBe('✓ Copied!');
   });
 

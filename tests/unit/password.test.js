@@ -2,13 +2,20 @@
  * Unit tests for password generation functionality
  */
 
-// Extract password generation function for testing
+// Extract password generation function for testing (matches content.js implementation)
 function generatePassword() {
   const length = 16;
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  const charsetLength = charset.length;
+  
+  // Use crypto.getRandomValues for cryptographically secure randomness
+  const randomValues = new Uint32Array(length);
+  crypto.getRandomValues(randomValues);
+  
   let password = '';
   for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
+    // Use modulo to map random value to charset index
+    password += charset[randomValues[i] % charsetLength];
   }
   return password;
 }
@@ -27,7 +34,7 @@ describe('Password Generation', () => {
   });
 
   test('should generate password with valid characters', () => {
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
     const password = generatePassword();
     
     // Check that all characters in password are from the charset
