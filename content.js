@@ -5,7 +5,7 @@ passwordContainer.style.bottom = '20px';
 passwordContainer.style.right = '20px';
 passwordContainer.style.backgroundColor = '#4CAF50';
 passwordContainer.style.color = 'white';
-passwordContainer.style.padding = '6px';
+passwordContainer.style.padding = '6px 10px';
 passwordContainer.style.borderRadius = '6px';
 passwordContainer.style.fontSize = '16px';
 passwordContainer.style.zIndex = '10000';
@@ -14,7 +14,7 @@ passwordContainer.style.alignItems = 'center';
 passwordContainer.style.justifyContent = 'center';
 passwordContainer.style.gap = '10px';
 passwordContainer.style.flexDirection = 'column';
-passwordContainer.style.width = '32px';
+passwordContainer.style.width = '40px';
 passwordContainer.style.height = '32px';
 passwordContainer.style.cursor = 'pointer';
 document.body.appendChild(passwordContainer);
@@ -206,8 +206,8 @@ function minimizeContainer() {
   expandableContent.style.display = 'none';
   minimizedIcons.style.display = 'flex';
   minimizeBtn.style.display = 'none';
-  passwordContainer.style.padding = '6px';
-  passwordContainer.style.width = '32px';
+  passwordContainer.style.padding = '6px 10px';
+  passwordContainer.style.width = '40px';
   passwordContainer.style.height = '32px';
   passwordContainer.style.cursor = 'pointer';
 }
