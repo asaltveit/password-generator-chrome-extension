@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Counter Popup</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 20px; 
+      text-align: center; 
+      margin: 0; 
+      min-width: 300px;
+    }
+    
+    body.expanded {
+      padding: 10px;
+    }
+    button { 
+      padding: 10px 20px; 
+      font-size: 16px; 
+      margin-top: 10px; 
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    
+    /* Collapsed state - icon only (shown by default) */
+    #iconContainer { 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      padding: 10px; 
+      cursor: pointer;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto;
+    }
+    #iconContainer img { width: 48px; height: 48px; }
+    
+    /* Expanded state - full content (hidden by default) */
+    #expandedContent { 
+      display: none; 
+      position: relative;
+    }
+    
+    body.expanded #iconContainer { 
+      display: none; 
+    }
+    
+    body.expanded #expandedContent { 
+      display: block; 
+    }
+    
+    #collapseBtn { 
+      position: absolute; 
+      top: 5px; 
+      right: 5px; 
+      padding: 5px 15px; 
+      font-size: 12px;
+      margin: 0;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      z-index: 10;
+    }
+    
+    #generatePassword {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      margin-top: 0;
+    }
+    
+    #copyPassword {
+      background-color: white;
+      color: #4CAF50;
+      font-weight: bold;
+      border: 1px solid #4CAF50;
+    }
+    
+    #passwordDisplay {
+      margin: 15px 0 20px 0;
+      padding: 15px 0;
+      font-size: 14px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div id="iconContainer">
+    <img src="assets/icon48.png" alt="Extension Icon" id="extensionIcon">
+  </div>
+  <div id="expandedContent">
+    <button id="collapseBtn">✕</button>
+    <div id="passwordDisplay" style="display: none;"></div>
+    <div style="padding-top: 5px;">
+      <button id="generatePassword">Generate Password</button>
+      <button id="copyPassword" style="display: none; margin-left: 10px;">📋 Copy</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
