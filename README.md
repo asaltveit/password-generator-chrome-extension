@@ -1,55 +1,56 @@
-# Hybrid Counter Chrome Extension
+# Password Generator Chrome Extension
 
-This Chrome extension displays a counter both in a popup and directly on any webpage. The counter persists across pages and updates live in all tabs.
+This Chrome extension generates secure random passwords in two places: in a popup (when you click the extension icon) and in a floating widget on any webpage. Passwords are 16 characters, use mixed case, numbers, and symbols, and can be copied to the clipboard with one click.
 
 ## Features
 
-- **Popup Counter**: Click the extension icon to see the counter and increment it.
-- **Page Counter**: A counter box appears in the bottom-right corner of every page.
-- **Live Sync**: Incrementing in either the popup or on a page updates all counters instantly.
-- **Persistent Storage**: Uses Chrome `storage.sync` to save the counter across sessions and tabs.
+- **Popup**: Click the extension icon to open a compact popup. Generate a password and copy it to the clipboard. The popup starts as an icon; click to expand, then use the close button or click outside to collapse.
+- **Page widget**: A small floating box (key + die icons) appears in the bottom-right corner of every page. Click it to expand, then use **Generate Password** and **Copy** just like in the popup. Click the ✕ or click outside to minimize.
+- **Secure generation**: Uses `crypto.getRandomValues` for cryptographically secure randomness.
+- **Clipboard**: Copy via the modern Clipboard API with an `execCommand('copy')` fallback when the API is restricted (e.g. in some content script contexts).
 
 ## How It Works
 
 1. **Popup**  
-   - The popup shows the current counter value stored in `chrome.storage.sync`.  
-   - Clicking the "Increment" button increases the counter and updates the storage.  
+   - Popup UI is in `popup.html`; logic in `popup.js`.  
+   - Collapsed by default (icon only). Click the icon to show **Generate Password** and **Copy**.  
+   - Generate creates a 16-character password (letters, numbers, `!@#$%^&*`). Copy writes it to the clipboard and shows “✓ Copied!” feedback.
 
-2. **Page Counter**  
-   - Injected via a content script (`content.js`) into every page.  
-   - Displays a counter box in the bottom-right corner.  
-   - Clicking the box increments the counter and updates `chrome.storage.sync`.  
-   - Uses `chrome.storage.onChanged` to listen for changes and update the counter live on all pages.
+2. **Page widget**  
+   - Injected by the content script (`content.js`) on all pages.  
+   - Minimized: small green box with key + die icons in the bottom-right.  
+   - Expanded: same Generate/Copy controls as the popup, plus a minimize (✕) button.  
+   - Minimize by clicking ✕ or clicking outside the widget.  
+   - Same password algorithm and clipboard behavior (with fallback) as the popup.
 
 ## How to Load the Extension
 
 1. Open Chrome and go to `chrome://extensions/`.
-2. Enable **Developer mode** (toggle in the top right).
-3. Click **Load unpacked** and select the folder containing this extension.
-4. Open any webpage — you should see the counter box in the bottom-right corner.
-5. Click the extension icon to open the popup. Both the popup and page counters are synced.
-6. Click either the popup button or the on-page counter to increment — the changes appear instantly everywhere.
+2. Turn on **Developer mode** (top right).
+3. Click **Load unpacked** and select the folder that contains the extension (e.g. `chrome-extension-1`).
+4. Open any webpage — you should see the floating widget in the bottom-right.
+5. Click the extension icon to use the popup, or click the widget on the page to generate and copy passwords from there.
 
 ## File Structure
 
 ```
 chrome-extension-1/
-├── manifest.json          # Extension manifest configuration
-├── popup.html             # Popup UI HTML
-├── popup.js               # Popup logic and counter handling
-├── content.js             # Content script injected into web pages
+├── manifest.json          # Extension manifest (name, permissions, popup, content script)
+├── popup.html             # Popup UI (collapsible icon + generate/copy)
+├── popup.js               # Popup logic: generate password, copy, expand/collapse
+├── content.js             # Content script: page widget UI and same generate/copy logic
 ├── jest.config.js         # Jest test configuration
-├── package.json           # Node.js dependencies and scripts
+├── package.json           # Node scripts and dependencies
 ├── assets/                # Extension icons
 │   ├── icon16.png
 │   ├── icon48.png
 │   └── icon128.png
 └── tests/                 # Test suite
     ├── setup.js           # Jest setup with Chrome API mocks
-    ├── unit/              # Unit tests
+    ├── unit/              # Unit tests (password generation, clipboard)
     │   ├── password.test.js
     │   └── clipboard.test.js
-    ├── integration/       # Integration tests
+    ├── integration/       # Integration tests (popup and content script UI)
     │   ├── popup.test.js
     │   └── content.test.js
     ├── utils/             # Test utilities
